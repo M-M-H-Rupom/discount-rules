@@ -88,7 +88,7 @@
                         <input type="text" name="options[${row_count}][discount]" id="" placeholder="Enter amount" value="">
                     </div>
                     <div class="close_btn">
-                        <span>close</span>
+                        <span><i class="fas fa-xmark"></i></span>
                     </div>
                 </td>
             </tr>
