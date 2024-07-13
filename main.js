@@ -15,16 +15,17 @@
         let discount_type = $(this).val();
         if(discount_type == ''){
             $(this).closest('tr').find('td').eq(1).find('.select_one').children().hide();
+        }else{
+            $.each( $(this).closest('tr').find('td').eq(1).find('select,input'), function(key, input) {
+                if( $(input).attr('name').indexOf(discount_type) != -1 ) {
+                    $(input).closest('div').show()
+                } else {
+                    $(input).closest('div').hide()
+                    $(input).val("")
+                }
+            })
         }
-        console.log(discount_type);
-        $.each( $(this).closest('tr').find('td').eq(1).find('select,input'), function(key, input) {
-            if( $(input).attr('name').indexOf(discount_type) != -1 ) {
-                $(input).closest('div').show()
-            } else {
-                $(input).closest('div').hide()
-                $(input).val("")
-            }
-        })
+        
     })
     $('.add_more_discount_row span').on('click',function(){
         let row_count = $('#row_count').val()
