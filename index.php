@@ -40,8 +40,10 @@ function script_callback(){
     }
     $rows = get_option( 'options');
     $discount_type = [];
-    foreach($rows as $row_key => $row_value){
-        $discount_type[$row_key] = $row_value['select_discount'] ;
+    if( !empty( $rows )) {
+        foreach($rows as $row_key => $row_value){
+            $discount_type[$row_key] = $row_value['select_discount'] ;
+        }
     }
     
     // $product_data_json = json_encode($product_data);
@@ -59,6 +61,7 @@ function custom_admin_menu_callback(){
 }
 add_action( 'admin_menu', 'custom_admin_menu_callback');
 function discount_rules_callback(){
+    // update_option('options',false);
     if (isset($_POST['discount_rules_submit'])) {
         if(isset($_POST['row_count'])){
             update_option('row_count', $_POST['row_count']);
@@ -68,9 +71,9 @@ function discount_rules_callback(){
         }
     }
     $rows = get_option( 'options');
-    // echo '<pre>';
-    // print_r($rows);
-    // echo '</pre>';
+    echo '<pre>';
+    print_r($rows);
+    echo '</pre>';
 
     $row_count = get_option('row_count');
     ?>  
@@ -88,7 +91,7 @@ function discount_rules_callback(){
                     foreach($rows as $row_key => $row_value){
                         // print_r($row_value);
                     ?>  
-                    <tr class="discount_row" data-row-count="">
+                    <tr class="discount_row" data-row-count="<?php echo $row_key ?>">
                         <td>
                             <div class="select_discount">
                                 <select name="options[<?php echo $row_key ?>][select_discount]" id="options_<?php echo $row_count ?>_select_discount" class='discount_type'>
@@ -110,12 +113,12 @@ function discount_rules_callback(){
                                 
                                 $product_list = '';
                                 foreach ($products as $product) {
-                                    $selected = selected($row_value['discount_item']['product'], $product->get_id(),false);
+                                    $selected = selected($row_value['discount_item']['product_discount'], $product->get_id(),false);
                                     $product_list .= '<option value="' . $product->get_id() . '"' . $selected . '>' . $product->get_name() . '</option>';
                                 }
                                 ?>
                                 <div class="select_product">
-                                    <select name="options[<?php echo $row_key ?>][discount_item][product]" id="options_<?php echo $row_count ?>_select_product">
+                                    <select name="options[<?php echo $row_key ?>][discount_item][product_discount]" id="options_<?php echo $row_count ?>_select_product">
                                         <option value="">Select Product</option>
                                         <?php echo $product_list; ?>
                                     </select>
@@ -129,12 +132,12 @@ function discount_rules_callback(){
                                             ));
                                 $category_list = '';
                                 foreach ($categories as $category) {
-                                    $selected = selected($row_value['discount_item']['category'], $category->term_id,false);
+                                    $selected = selected($row_value['discount_item']['category_discount'], $category->term_id,false);
                                     $category_list .= '<option value="' . $category->term_id . '"' . $selected . '>' . $category->name . '</option>';
                                 }
                                 ?>
                                 <div class="select_category">
-                                    <select name="options[<?php echo $row_key ?>][discount_item][category]" id="options_<?php echo $row_count ?>_select_category">
+                                    <select name="options[<?php echo $row_key ?>][discount_item][category_discount]" id="options_<?php echo $row_count ?>_select_category">
                                         <option value="">Select Category</option>
                                         <?php echo $category_list; ?>
                                     </select>
@@ -143,7 +146,7 @@ function discount_rules_callback(){
                                 <!-- Cart amount here  -->
                                 <div class="min_max_cart_amount">
                                     <span>
-                                        <input type="text" name="options[<?php echo $row_key ?>][discount_item][min_amount]" id="" placeholder="Min Card Amount" value="<?php echo $row_value['discount_item']['min_amount'] ?>">
+                                        <input type="text" name="options[<?php echo $row_key ?>][discount_item][cart_amount_discount]" id="" placeholder="Min Card Amount" value="<?php echo $row_value['discount_item']['cart_amount_discount'] ?>">
                                     </span>
                                 </div>
                                 <!-- cls -->

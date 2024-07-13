@@ -1,35 +1,30 @@
 ;(function($){
-    // $('.discount_row').find('.select_one').children().hide();
-    // console.log(ajax_obj.discount_type);
-    // let discount_types = ajax_obj.discount_type ;
-    // for(let type in discount_types){
-    //     if(discount_types[type] == 'product_discount'){
-    //         $(this).closest('.discount_row').find('.select_one').children().hide();
-    //             $(this).closest('.discount_row').find('.select_product').show();
-    //     }else if(discount_types[type] == 'category_discount'){
-    //         $(this).closest('.discount_row').find('.select_one').children().hide();
-    //         $(this).closest('.discount_row').find('.select_category').show();
-    //     }
-    // }
+    console.log(ajax_obj.discount_type);
+    $.each( $('#discount_rules_table tr'), function(key, row) {
+        if( $(row).find('th').length == 0 ) {
+            let item_inputs = $(row).find('td').eq(1)
+            $.each(item_inputs.find('select, input'), function( key, input ) {
+                if( $(input).val() == "" ) {
+                    $(input).closest('div').hide()
+                }
+            })
+        }
+    } )
+    
     $(document).on('change','.discount_type',function(){
         let discount_type = $(this).val();
-        let this_class = $(this);
-        switch (discount_type) {
-            case 'product_discount':
-                $(this).closest('.discount_row').find('.select_one').children().hide();
-                $(this).closest('.discount_row').find('.select_product').show();
-                
-            break;
-            case 'category_discount':
-                $(this).closest('.discount_row').find('.select_one').children().hide();
-                $(this).closest('.discount_row').find('.select_category').show();
-               
-            break;
-            case 'cart_amount_discount':
-                $(this).closest('.discount_row').find('.select_one').children().hide();
-                $(this).closest('.discount_row').find('.min_max_cart_amount').show();
-            break;
+        if(discount_type == ''){
+            $(this).closest('tr').find('td').eq(1).find('.select_one').children().hide();
         }
+        console.log(discount_type);
+        $.each( $(this).closest('tr').find('td').eq(1).find('select,input'), function(key, input) {
+            if( $(input).attr('name').indexOf(discount_type) != -1 ) {
+                $(input).closest('div').show()
+            } else {
+                $(input).closest('div').hide()
+                $(input).val("")
+            }
+        })
     })
     $('.add_more_discount_row span').on('click',function(){
         let row_count = $('#row_count').val()
@@ -48,7 +43,7 @@
         });
         // 
         let row_data = `
-            <tr class="discount_row" data-row-count="">
+            <tr class="discount_row" data-row-count="${row_count}">
                 <td>
                     <div class="select_discount">
                         <select name="options[${row_count}][select_discount]" class='discount_type'>
@@ -63,7 +58,7 @@
                     <div class="select_one">
                         
                         <div class="select_product">
-                            <select name="options[${row_count}][discount_item][product]" id="">
+                            <select name="options[${row_count}][discount_item][product_discount]" id="">
                                 <option value="">Select Product</option>
                                 ${product_list}
                             </select>
@@ -72,7 +67,7 @@
                         <!-- category data here -->
                             
                         <div class="select_category">
-                            <select name="options[${row_count}][discount_item][category]" id="">
+                            <select name="options[${row_count}][discount_item][category_discount]" id="">
                                 <option value="">Select Category</option>
                                 ${category_list}
                             </select>
@@ -81,7 +76,7 @@
                         <!-- Cart amount here  -->
                         <div class="min_max_cart_amount">
                             <span>
-                                <input type="text" name="options[${row_count}][discount_item][min_amount]" id="" placeholder="Min Card Amount">
+                                <input type="text" name="options[${row_count}][discount_item][cart_amount_discount]" id="" placeholder="Min Card Amount">
                             </span>
                         </div>
                         <!-- cls -->
@@ -101,7 +96,6 @@
         $('#row_count').val(row_count)
         $('#discount_rules_table').append(row_data);
         $('#discount_rules_table .discount_row').eq(-1).find('.select_one').children().hide();
-        // $('.discount_row').find('.select_one').children().hide();
     })
 
     $(document).on('click','.close_btn',function(){
