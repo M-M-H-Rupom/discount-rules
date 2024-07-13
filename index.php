@@ -71,9 +71,9 @@ function discount_rules_callback(){
         }
     }
     $rows = get_option( 'options');
-    echo '<pre>';
-    print_r($rows);
-    echo '</pre>';
+    // echo '<pre>';
+    // print_r($rows);
+    // echo '</pre>';
 
     $row_count = get_option('row_count');
     ?>  
@@ -183,19 +183,22 @@ function apply_discounts_callback($cart) {
     $product_discounts = array();
     $category_discounts = array();
     $min_amount_discounts = array();
-    // foreach($rows as $row_key => $row_value){
-    //     if($row_value['select_discount'] == 'product_discount'){
-    //         $product_discounts[$row_value['discount_item']['product_discount']] = $row_value['discount'];
-    //     }elseif($row_value['select_discount'] == 'category_discount'){
-    //         $category_discounts[$row_value['discount_item']['category_discount']] = $row_value['discount'];
-    //     }elseif($row_value['select_discount'] == 'cart_amount_discount'){
-    //         $min_amount_discounts[$row_value['discount_item']['cart_amount_discount']] = $row_value['discount'];
-    //     }
-    // }
+    foreach($rows as $row_key => $row_value){
+        if($row_value['select_discount'] == 'product_discount'){
+            $product_discounts[$row_value['discount_item']['product_discount']] = $row_value['discount'];
+        }elseif($row_value['select_discount'] == 'category_discount'){
+            $category_discounts[$row_value['discount_item']['category_discount']] = $row_value['discount'];
+        }elseif($row_value['select_discount'] == 'cart_amount_discount'){
+            $min_amount_discounts[$row_value['discount_item']['cart_amount_discount']] = $row_value['discount'];
+        }
+    }
     $total_discount = 0;
     foreach($cart->get_cart() as $cart_item_key => $cart_item) {
         $product = $cart_item['data'];
         $product_id = $product->get_id();
+        if ($product->is_type('variation')) {
+            $product_id = $product->get_parent_id();
+        }
         $categories = wp_get_post_terms($product_id, 'product_cat', array('fields' => 'ids'));
         // the product discount
         if(isset($product_discounts[$product_id])) {
@@ -213,7 +216,7 @@ function apply_discounts_callback($cart) {
     $cart_total = $cart->get_cart_contents_total();
     foreach($min_amount_discounts as $min_amount => $discount_amount){
         if ($cart_total >= $min_amount) {
-            $total_discount += $discount_amount;
+            $total_discount += intval($discount_amount);
         }
     }
     // print_r($cart_total);
